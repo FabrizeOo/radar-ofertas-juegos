@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LootRadar — Ofertas de Videojuegos PC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="ambient-bg" aria-hidden="true"></div>
+
+<header class="navbar">
+    <div class="nav-inner">
+        <div class="brand">
+            <div class="brand-icon">🎮</div>
+            <div>
+                <h1>LootRadar</h1>
+                <p>Cazador de ofertas PC en tiendas oficiales</p>
+            </div>
+        </div>
+
+        <div class="nav-actions">
+            <div id="liveIndicator" class="pulse-badge">
+                <span class="pulse-dot"></span>
+                <span id="liveText">Conectando...</span>
+            </div>
+            <button id="btnRefreshCatalog" class="btn btn-outline">
+                ↻ Actualizar ofertas
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <!-- Hero: Oferta destacada del momento -->
+    <section id="heroSpotlight" class="hero-card skeleton-hero">
+        <div class="hero-content">
+            <span class="hero-tag">🔥 Oferta destacada</span>
+            <h2>Cargando la mejor oferta del día...</h2>
+        </div>
+    </section>
+
+    <!-- Métricas amigables para el usuario -->
+    <section class="highlights-strip">
+        <div class="highlight-box">
+            <span class="hl-label">Ofertas disponibles</span>
+            <strong id="statOfertas" class="hl-value">—</strong>
+        </div>
+        <div class="highlight-box">
+            <span class="hl-label">Ahorro promedio</span>
+            <strong id="statAhorro" class="hl-value accent-mint">—</strong>
+        </div>
+        <div class="highlight-box">
+            <span class="hl-label">Opiniones de jugadores</span>
+            <strong id="statComentarios" class="hl-value">—</strong>
+        </div>
+        <div class="highlight-box highlight-stores">
+            <span class="hl-label">Tiendas con más descuentos</span>
+            <div id="statTiendas" class="store-chips">Cargando...</div>
+        </div>
+    </section>
+
+    <div class="workspace-grid">
+        <!-- Catálogo Principal -->
+        <section class="catalog-section">
+            <div class="toolbar">
+                <div class="search-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input id="inputBuscar" type="search" placeholder="Busca tu próximo juego (ej. Elden Ring, Witcher, Resident Evil)..." autocomplete="off">
+                </div>
+
+                <select id="selectAhorro" aria-label="Filtrar por descuento">
+                    <option value="0">Todos los descuentos</option>
+                    <option value="50">50% o más</option>
+                    <option value="75">75% o más</option>
+                    <option value="85">85% o más</option>
+                </select>
+            </div>
+
+            <!-- Pills interactivas de tiendas -->
+            <div id="storePills" class="store-pills" role="tablist" aria-label="Filtrar por tienda">
+                <button class="pill active" data-store="TODAS">Todas</button>
+                <button class="pill" data-store="Steam">Steam</button>
+                <button class="pill" data-store="GOG">GOG</button>
+                <button class="pill" data-store="Humble Store">Humble Store</button>
+                <button class="pill" data-store="GreenManGaming">GreenManGaming</button>
+                <button class="pill" data-store="Fanatical">Fanatical</button>
+                <button class="pill" data-store="Gamesplanet">Gamesplanet</button>
+                <button class="pill" data-store="GamersGate">GamersGate</button>
+            </div>
+
+            <div id="ofertasGrid" class="deals-grid">
+                <div class="empty-state">Buscando las mejores ofertas para ti...</div>
+            </div>
+
+            <div class="pagination">
+                <button id="btnPrev" class="btn btn-outline">← Anterior</button>
+                <span id="paginaLabel" class="page-indicator">Página 1</span>
+                <button id="btnNext" class="btn btn-outline">Siguiente →</button>
+            </div>
+        </section>
+
+        <!-- Comunidad Gamer -->
+        <aside class="community-dock">
+            <div class="dock-header">
+                <div>
+                    <h2>💬 Comunidad Gamer</h2>
+                    <p>Opina sobre descuentos y recomienda joyas</p>
+                </div>
+            </div>
+
+            <form id="formComentarioGlobal" class="composer">
+                <div class="composer-target" id="targetLabel">
+                    <span>Sobre: <strong>Comunidad General</strong></span>
+                    <button type="button" id="btnLimpiarTarget" class="text-link hidden">Cambiar</button>
+                </div>
+                <input id="inputAutor" type="text" maxlength="40" placeholder="Tu apodo (ej. @KratosPY)" required>
+                <textarea id="inputContenido" rows="3" maxlength="280" placeholder="¿Lo recomiendas a ese precio? Cuéntale a la comunidad..." required></textarea>
+                <div class="composer-footer">
+                    <select id="selectCalificacion" aria-label="Tu puntuación">
+                        <option value="5">★★★★★ Imperdible</option>
+                        <option value="4">★★★★☆ Muy bueno</option>
+                        <option value="3">★★★☆☆ Aceptable</option>
+                        <option value="2">★★☆☆☆ Espera más rebaja</option>
+                        <option value="1">★☆☆☆☆ No vale la pena</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Publicar</button>
+                </div>
+            </form>
+
+            <div id="feedComentarios" class="comments-stream">
+                <div class="empty-state">Sé el primero en opinar sobre una oferta.</div>
+            </div>
+        </aside>
+    </div>
+</main>
+
+<!-- Modal Detalle del Juego + Compra Directa + Comentarios -->
+<div id="modalDetalle" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+        <button id="btnCerrarDetalle" class="modal-close" aria-label="Cerrar">✕</button>
+        <div id="detalleBody"></div>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
