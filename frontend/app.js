@@ -1,5 +1,5 @@
-// URL del backend (cámbiala por tu URL de Render/Railway al subir a Vercel)
-const API_BASE_URL = new URLSearchParams(window.location.search).get("api") || "http://localhost:8081";
+// URL del backend en Render (puedes usar ?api=http://localhost:8081 para pruebas locales)
+const API_BASE_URL = new URLSearchParams(window.location.search).get("api") || "https://radar-ofertas-juegos.onrender.com";
 
 let paginaActual = 0;
 const TAMANO_PAGINA = 24;
