@@ -3,21 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LootRadar — Ofertas de Videojuegos PC</title>
+    <title>LootRadar | Ofertas de videojuegos PC</title>
+    <meta name="description" content="Radar de ofertas de videojuegos para PC en tiendas oficiales, con comunidad gamer en tiempo real.">
+    <meta name="theme-color" content="#07070d">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<!-- Sprite de iconos (trazo 2px, estilo uniforme) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></symbol>
+    <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="i-gamepad" viewBox="0 0 24 24"><line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5"/></symbol>
+    <symbol id="i-percent" viewBox="0 0 24 24"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-store" viewBox="0 0 24 24"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+</svg>
+
 <div class="ambient-bg" aria-hidden="true"></div>
 
 <header class="navbar">
     <div class="nav-inner">
         <div class="brand">
-            <div class="brand-icon">🎮</div>
+            <img class="brand-icon" src="logo.svg" width="42" height="42" alt="Logo de LootRadar">
             <div>
-                <h1>LootRadar</h1>
+                <h1>Loot<span>Radar</span></h1>
                 <p>Cazador de ofertas PC en tiendas oficiales</p>
             </div>
         </div>
@@ -28,7 +54,8 @@
                 <span id="liveText">Conectando...</span>
             </div>
             <button id="btnRefreshCatalog" class="btn btn-outline">
-                ↻ Actualizar ofertas
+                <svg class="i" aria-hidden="true"><use href="#i-refresh"/></svg>
+                <span>Actualizar ofertas</span>
             </button>
         </div>
     </div>
@@ -38,7 +65,7 @@
     <!-- Hero: Oferta destacada del momento -->
     <section id="heroSpotlight" class="hero-card skeleton-hero">
         <div class="hero-content">
-            <span class="hero-tag">🔥 Oferta destacada</span>
+            <span class="hero-tag"><svg class="i" aria-hidden="true"><use href="#i-flame"/></svg>Oferta destacada</span>
             <h2>Cargando la mejor oferta del día...</h2>
         </div>
     </section>
@@ -46,19 +73,19 @@
     <!-- Métricas amigables para el usuario -->
     <section class="highlights-strip">
         <div class="highlight-box">
-            <span class="hl-label">Ofertas disponibles</span>
-            <strong id="statOfertas" class="hl-value">—</strong>
+            <span class="hl-label"><svg class="i" aria-hidden="true"><use href="#i-tag"/></svg>Ofertas disponibles</span>
+            <strong id="statOfertas" class="hl-value">...</strong>
         </div>
         <div class="highlight-box">
-            <span class="hl-label">Ahorro promedio</span>
-            <strong id="statAhorro" class="hl-value accent-mint">—</strong>
+            <span class="hl-label"><svg class="i" aria-hidden="true"><use href="#i-percent"/></svg>Ahorro promedio</span>
+            <strong id="statAhorro" class="hl-value accent-mint">...</strong>
         </div>
         <div class="highlight-box">
-            <span class="hl-label">Opiniones de jugadores</span>
-            <strong id="statComentarios" class="hl-value">—</strong>
+            <span class="hl-label"><svg class="i" aria-hidden="true"><use href="#i-users"/></svg>Opiniones de jugadores</span>
+            <strong id="statComentarios" class="hl-value">...</strong>
         </div>
         <div class="highlight-box highlight-stores">
-            <span class="hl-label">Tiendas con más descuentos</span>
+            <span class="hl-label"><svg class="i" aria-hidden="true"><use href="#i-store"/></svg>Tiendas con más descuentos</span>
             <div id="statTiendas" class="store-chips">Cargando...</div>
         </div>
     </section>
@@ -67,10 +94,10 @@
         <!-- Catálogo Principal -->
         <section class="catalog-section">
             <div class="toolbar">
-                <div class="search-wrap">
-                    <span class="search-icon">🔍</span>
-                    <input id="inputBuscar" type="search" placeholder="Busca tu próximo juego (ej. Elden Ring, Witcher, Resident Evil)..." autocomplete="off">
-                </div>
+                <label class="search-wrap">
+                    <svg class="i search-icon" aria-hidden="true"><use href="#i-search"/></svg>
+                    <input id="inputBuscar" type="search" placeholder="Busca tu próximo juego (ej. Elden Ring, Witcher, Resident Evil)" autocomplete="off" aria-label="Buscar juego">
+                </label>
 
                 <select id="selectAhorro" aria-label="Filtrar por descuento">
                     <option value="0">Todos los descuentos</option>
@@ -82,14 +109,14 @@
 
             <!-- Pills interactivas de tiendas -->
             <div id="storePills" class="store-pills" role="tablist" aria-label="Filtrar por tienda">
-                <button class="pill active" data-store="TODAS">Todas</button>
-                <button class="pill" data-store="Steam">Steam</button>
-                <button class="pill" data-store="GOG">GOG</button>
-                <button class="pill" data-store="Humble Store">Humble Store</button>
-                <button class="pill" data-store="GreenManGaming">GreenManGaming</button>
-                <button class="pill" data-store="Fanatical">Fanatical</button>
-                <button class="pill" data-store="Gamesplanet">Gamesplanet</button>
-                <button class="pill" data-store="GamersGate">GamersGate</button>
+                <button class="pill active" data-store="TODAS"><svg class="i" aria-hidden="true"><use href="#i-store"/></svg>Todas</button>
+                <button class="pill" data-store="Steam"><img src="https://www.cheapshark.com/img/stores/icons/0.png" alt="" width="16" height="16" onerror="this.remove()">Steam</button>
+                <button class="pill" data-store="GOG"><img src="https://www.cheapshark.com/img/stores/icons/6.png" alt="" width="16" height="16" onerror="this.remove()">GOG</button>
+                <button class="pill" data-store="Humble Store"><img src="https://www.cheapshark.com/img/stores/icons/10.png" alt="" width="16" height="16" onerror="this.remove()">Humble Store</button>
+                <button class="pill" data-store="GreenManGaming"><img src="https://www.cheapshark.com/img/stores/icons/2.png" alt="" width="16" height="16" onerror="this.remove()">GreenManGaming</button>
+                <button class="pill" data-store="Fanatical"><img src="https://www.cheapshark.com/img/stores/icons/14.png" alt="" width="16" height="16" onerror="this.remove()">Fanatical</button>
+                <button class="pill" data-store="Gamesplanet"><img src="https://www.cheapshark.com/img/stores/icons/26.png" alt="" width="16" height="16" onerror="this.remove()">Gamesplanet</button>
+                <button class="pill" data-store="GamersGate"><img src="https://www.cheapshark.com/img/stores/icons/1.png" alt="" width="16" height="16" onerror="this.remove()">GamersGate</button>
             </div>
 
             <div id="ofertasGrid" class="deals-grid">
@@ -97,17 +124,18 @@
             </div>
 
             <div class="pagination">
-                <button id="btnPrev" class="btn btn-outline">← Anterior</button>
+                <button id="btnPrev" class="btn btn-outline"><svg class="i" aria-hidden="true"><use href="#i-left"/></svg>Anterior</button>
                 <span id="paginaLabel" class="page-indicator">Página 1</span>
-                <button id="btnNext" class="btn btn-outline">Siguiente →</button>
+                <button id="btnNext" class="btn btn-outline">Siguiente<svg class="i" aria-hidden="true"><use href="#i-right"/></svg></button>
             </div>
         </section>
 
         <!-- Comunidad Gamer -->
         <aside class="community-dock">
             <div class="dock-header">
+                <span class="section-icon"><svg class="i" aria-hidden="true"><use href="#i-message"/></svg></span>
                 <div>
-                    <h2>💬 Comunidad Gamer</h2>
+                    <h2>Comunidad Gamer</h2>
                     <p>Opina sobre descuentos y recomienda joyas</p>
                 </div>
             </div>
@@ -117,17 +145,17 @@
                     <span>Sobre: <strong>Comunidad General</strong></span>
                     <button type="button" id="btnLimpiarTarget" class="text-link hidden">Cambiar</button>
                 </div>
-                <input id="inputAutor" type="text" maxlength="40" placeholder="Tu apodo (ej. @KratosPY)" required>
-                <textarea id="inputContenido" rows="3" maxlength="280" placeholder="¿Lo recomiendas a ese precio? Cuéntale a la comunidad..." required></textarea>
+                <input id="inputAutor" type="text" maxlength="40" placeholder="Tu apodo (ej. @KratosPY)" aria-label="Tu apodo" required>
+                <textarea id="inputContenido" rows="3" maxlength="280" placeholder="¿Lo recomiendas a ese precio? Cuéntale a la comunidad..." aria-label="Tu opinión" required></textarea>
                 <div class="composer-footer">
                     <select id="selectCalificacion" aria-label="Tu puntuación">
-                        <option value="5">★★★★★ Imperdible</option>
-                        <option value="4">★★★★☆ Muy bueno</option>
-                        <option value="3">★★★☆☆ Aceptable</option>
-                        <option value="2">★★☆☆☆ Espera más rebaja</option>
-                        <option value="1">★☆☆☆☆ No vale la pena</option>
+                        <option value="5">5/5 · Imperdible</option>
+                        <option value="4">4/5 · Muy bueno</option>
+                        <option value="3">3/5 · Aceptable</option>
+                        <option value="2">2/5 · Espera más rebaja</option>
+                        <option value="1">1/5 · No vale la pena</option>
                     </select>
-                    <button type="submit" class="btn btn-primary">Publicar</button>
+                    <button type="submit" class="btn btn-primary"><svg class="i" aria-hidden="true"><use href="#i-send"/></svg>Publicar</button>
                 </div>
             </form>
 
@@ -138,10 +166,15 @@
     </div>
 </main>
 
+<footer class="site-footer">
+    <img src="logo.svg" width="22" height="22" alt="">
+    <span>LootRadar · Precios y tiendas vía CheapShark</span>
+</footer>
+
 <!-- Modal Detalle del Juego + Compra Directa + Comentarios -->
 <div id="modalDetalle" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-card">
-        <button id="btnCerrarDetalle" class="modal-close" aria-label="Cerrar">✕</button>
+        <button id="btnCerrarDetalle" class="modal-close" aria-label="Cerrar"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
         <div id="detalleBody"></div>
     </div>
 </div>

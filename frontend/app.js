@@ -149,21 +149,25 @@ function urlCompraDirecta(dealId) {
 
 function pintarHero(top) {
     if (!top) return;
+    el.heroSpotlight.classList.remove("skeleton-hero");
     el.heroSpotlight.innerHTML = `
+        <div class="hero-backdrop" style="background-image:url('${escaparHtml(top.urlImagen || "")}')" aria-hidden="true"></div>
         <div class="hero-content">
-            <span class="hero-tag">🔥 Destacada en ${escaparHtml(top.tiendaNombre || "Tienda oficial")}</span>
+            <span class="hero-tag">${logoTienda(top.storeId) || icono("flame")} Destacada en ${escaparHtml(top.tiendaNombre || "Tienda oficial")}</span>
             <h2>${escaparHtml(top.titulo)}</h2>
             <div class="hero-meta">
-                ${top.metacriticScore > 0 ? `<span>🎯 Crítica: ${top.metacriticScore}/100</span>` : ""}
-                ${top.steamRatingPercent > 0 ? `<span>👍 Jugadores: ${top.steamRatingPercent}%</span>` : ""}
-                <span>⭐ ${top.likes || 0} me gusta</span>
+                ${top.metacriticScore > 0 ? `<span>${icono("target")} Crítica: ${top.metacriticScore}/100</span>` : ""}
+                ${top.steamRatingPercent > 0 ? `<span>${icono("thumb")} Jugadores: ${top.steamRatingPercent}%</span>` : ""}
+                <span>${icono("heart")} ${top.likes || 0} me gusta</span>
             </div>
             <div class="hero-prices">
                 <span class="hero-discount">-${Math.round(top.porcentajeAhorro)}%</span>
                 <span class="hero-price-now">$${Number(top.precioOferta).toFixed(2)}</span>
                 <span class="hero-price-old">$${Number(top.precioNormal).toFixed(2)}</span>
+            </div>
+            <div class="hero-actions">
                 <a class="btn btn-mint" href="${urlCompraDirecta(top.dealId)}" target="_blank" rel="noopener noreferrer">
-                    🛒 Comprar en ${escaparHtml(top.tiendaNombre || "tienda")}
+                    ${icono("cart")} Comprar en ${escaparHtml(top.tiendaNombre || "tienda")}
                 </a>
                 <button class="btn btn-outline" onclick="abrirDetalle('${encodeURIComponent(top.dealId)}')">
                     Ver detalles
@@ -187,15 +191,15 @@ function pintarOfertas(ofertas) {
             <div class="deal-thumb" onclick="abrirDetalle('${encodeURIComponent(o.dealId)}')">
                 <img src="${escaparHtml(o.urlImagen || "")}" alt="${escaparHtml(o.titulo)}" loading="lazy">
                 <span class="deal-discount-tag">-${Math.round(o.porcentajeAhorro)}%</span>
-                <span class="deal-store-tag">${escaparHtml(o.tiendaNombre || "Tienda")}</span>
+                <span class="deal-store-tag">${logoTienda(o.storeId)}${escaparHtml(o.tiendaNombre || "Tienda")}</span>
             </div>
             <div class="deal-body">
                 <h3 class="deal-title" onclick="abrirDetalle('${encodeURIComponent(o.dealId)}')" title="${escaparHtml(o.titulo)}">
                     ${escaparHtml(o.titulo)}
                 </h3>
                 <div class="deal-scores">
-                    ${o.metacriticScore > 0 ? `<span class="score-pill">🎯 ${o.metacriticScore}</span>` : ""}
-                    ${o.steamRatingPercent > 0 ? `<span class="score-pill">👍 ${o.steamRatingPercent}%</span>` : ""}
+                    ${o.metacriticScore > 0 ? `<span class="score-pill" title="Puntuación de la crítica">${icono("target")} ${o.metacriticScore}</span>` : ""}
+                    ${o.steamRatingPercent > 0 ? `<span class="score-pill" title="Valoración de jugadores">${icono("thumb")} ${o.steamRatingPercent}%</span>` : ""}
                 </div>
                 <div class="deal-price-row">
                     <span class="price-now">$${Number(o.precioOferta).toFixed(2)}</span>
@@ -203,13 +207,13 @@ function pintarOfertas(ofertas) {
                 </div>
                 <div class="deal-actions">
                     <a class="btn btn-mint" href="${urlCompraDirecta(o.dealId)}" target="_blank" rel="noopener noreferrer" title="Ir a la tienda para comprar">
-                        🛒 Ir a tienda
+                        ${icono("cart")} Ir a tienda
                     </a>
-                    <button class="btn btn-outline" onclick="darLike('${encodeURIComponent(o.dealId)}')" title="Me gusta">
-                        ❤️ <span class="like-count">${o.likes || 0}</span>
+                    <button class="btn btn-outline" onclick="darLike('${encodeURIComponent(o.dealId)}')" title="Me gusta" aria-label="Me gusta">
+                        ${icono("heart")} <span class="like-count">${o.likes || 0}</span>
                     </button>
-                    <button class="btn btn-outline" onclick="seleccionarObjetivoDesdeBoton('${encodeURIComponent(o.dealId)}', '${encodeURIComponent(o.titulo)}')" title="Comentar sobre este juego">
-                        💬
+                    <button class="btn btn-outline" onclick="seleccionarObjetivoDesdeBoton('${encodeURIComponent(o.dealId)}', '${encodeURIComponent(o.titulo)}')" title="Comentar sobre este juego" aria-label="Comentar sobre este juego">
+                        ${icono("message")}
                     </button>
                 </div>
             </div>
@@ -225,13 +229,13 @@ window.abrirDetalle = async function (encodedDealId) {
     const ahorroDinero = Math.max(0, oferta.precioNormal - oferta.precioOferta).toFixed(2);
     el.detalleBody.innerHTML = `
         <img class="detail-banner" src="${escaparHtml(oferta.urlImagen || "")}" alt="${escaparHtml(oferta.titulo)}">
-        <h2>${escaparHtml(oferta.titulo)}</h2>
-        <p style="color: var(--muted); font-size: 0.85rem;">Disponible en <strong>${escaparHtml(oferta.tiendaNombre)}</strong></p>
+        <h2 class="detail-title">${escaparHtml(oferta.titulo)}</h2>
+        <p class="detail-store">${logoTienda(oferta.storeId)}Disponible en <strong>${escaparHtml(oferta.tiendaNombre)}</strong></p>
 
         <div class="detail-grid">
             <div class="detail-stat">
                 <span>Precio hoy</span>
-                <strong style="color: var(--mint)">$${Number(oferta.precioOferta).toFixed(2)}</strong>
+                <strong class="accent-mint">$${Number(oferta.precioOferta).toFixed(2)}</strong>
             </div>
             <div class="detail-stat">
                 <span>Ahorras</span>
@@ -243,17 +247,17 @@ window.abrirDetalle = async function (encodedDealId) {
             </div>
         </div>
 
-        <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-            <a class="btn btn-mint" style="flex:1" href="${urlCompraDirecta(oferta.dealId)}" target="_blank" rel="noopener noreferrer">
-                🛒 Comprar ahora en ${escaparHtml(oferta.tiendaNombre)} →
+        <div class="detail-actions">
+            <a class="btn btn-mint" href="${urlCompraDirecta(oferta.dealId)}" target="_blank" rel="noopener noreferrer">
+                ${icono("cart")} Comprar ahora en ${escaparHtml(oferta.tiendaNombre)} ${icono("external")}
             </a>
             <button class="btn btn-primary" onclick="seleccionarDesdeModal('${encodeURIComponent(oferta.dealId)}', '${encodeURIComponent(oferta.titulo)}')">
-                💬 Escribir opinión
+                ${icono("message")} Escribir opinión
             </button>
         </div>
 
         <div class="detail-comments" id="detalleComentarios">
-            <p style="color: var(--muted); font-size: 0.84rem;">Cargando opiniones de este juego...</p>
+            <p class="detail-note">Cargando opiniones de este juego...</p>
         </div>
     `;
     el.modalDetalle.classList.remove("hidden");
@@ -263,7 +267,7 @@ window.abrirDetalle = async function (encodedDealId) {
         const lista = await res.json();
         const cont = document.getElementById("detalleComentarios");
         if (!lista.length) {
-            cont.innerHTML = `<p style="color: var(--muted); font-size: 0.84rem;">Aún no hay opiniones sobre este juego. ¡Sé el primero!</p>`;
+            cont.innerHTML = `<p class="detail-note">Aún no hay opiniones sobre este juego. ¡Sé el primero!</p>`;
         } else {
             cont.innerHTML = `<h3>Opiniones de jugadores</h3>` + lista.map(renderComentarioHtml).join("");
         }
@@ -279,8 +283,9 @@ window.seleccionarDesdeModal = function (encodedDealId, encodedTitulo) {
 
 async function actualizarCatalogo() {
     el.btnRefreshCatalog.disabled = true;
-    const original = el.btnRefreshCatalog.textContent;
-    el.btnRefreshCatalog.textContent = "⏳ Buscando rebajas...";
+    const original = el.btnRefreshCatalog.innerHTML;
+    el.btnRefreshCatalog.classList.add("is-loading");
+    el.btnRefreshCatalog.innerHTML = `${icono("refresh")}<span>Buscando rebajas...</span>`;
     try {
         const res = await fetch(`${API_BASE_URL}/api/ofertas/sincronizar?paginas=10`, { method: "POST" });
         if (!res.ok) throw new Error();
@@ -289,7 +294,8 @@ async function actualizarCatalogo() {
         alert("No se pudo actualizar el catálogo en este momento.");
     } finally {
         el.btnRefreshCatalog.disabled = false;
-        el.btnRefreshCatalog.textContent = original;
+        el.btnRefreshCatalog.classList.remove("is-loading");
+        el.btnRefreshCatalog.innerHTML = original;
     }
 }
 
@@ -347,15 +353,20 @@ function pintarComentarios(lista) {
 }
 
 function renderComentarioHtml(c) {
-    const estrellas = "★".repeat(c.calificacion || 5) + "☆".repeat(Math.max(0, 5 - (c.calificacion || 5)));
+    const nota = Math.min(5, Math.max(0, c.calificacion || 5));
+    const estrellas = Array.from({ length: 5 }, (_, i) => icono("star", i < nota ? "on" : "off")).join("");
     const fecha = c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleString("es-ES") : "Recién publicado";
+    const inicial = String(c.autor || "?").replace(/^@/, "").charAt(0) || "?";
     return `
         <div class="comment-card">
             <div class="comment-head">
-                <span class="comment-author">${escaparHtml(c.autor)}</span>
-                <span class="comment-stars">${estrellas}</span>
+                <span class="comment-who">
+                    <span class="comment-avatar" style="background:${colorDesdeTexto(c.autor)}">${escaparHtml(inicial)}</span>
+                    <span class="comment-author">${escaparHtml(c.autor)}</span>
+                </span>
+                <span class="comment-stars" role="img" aria-label="${nota} de 5 estrellas">${estrellas}</span>
             </div>
-            <div class="comment-game">🎮 ${escaparHtml(c.tituloJuego || "Comunidad General")}</div>
+            <div class="comment-game">${icono("gamepad")} ${escaparHtml(c.tituloJuego || "Comunidad General")}</div>
             <p class="comment-body">${escaparHtml(c.contenido)}</p>
             <div class="comment-time">${fecha}</div>
         </div>
@@ -418,6 +429,24 @@ function conectarTiempoReal() {
         el.liveIndicator.className = "pulse-badge";
         el.liveText.textContent = "Reconectando...";
     };
+}
+
+function icono(nombre, clase = "") {
+    return `<svg class="i ${clase}" aria-hidden="true"><use href="#i-${nombre}"/></svg>`;
+}
+
+// CheapShark publica el ícono de cada tienda como (storeID - 1).png
+function logoTienda(storeId) {
+    const n = parseInt(storeId, 10);
+    if (!Number.isFinite(n) || n < 1) return "";
+    return `<img class="store-logo" src="https://www.cheapshark.com/img/stores/icons/${n - 1}.png" alt="" width="14" height="14" loading="lazy" onerror="this.remove()">`;
+}
+
+function colorDesdeTexto(texto) {
+    const paleta = ["#a78bfa", "#34d399", "#fbbf24", "#60a5fa", "#fb7185", "#22d3ee"];
+    let h = 0;
+    for (const ch of String(texto || "")) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return paleta[h % paleta.length];
 }
 
 function escaparHtml(texto) {
