@@ -34,6 +34,10 @@
     <symbol id="i-store" viewBox="0 0 24 24"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/><path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"/></symbol>
     <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
     <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
 </svg>
 
 <div class="ambient-bg" aria-hidden="true"></div>
@@ -90,10 +94,40 @@
         </div>
     </section>
 
+    <!-- Panel de Operaciones de Base de Datos (CRUD + Agregaciones MongoDB) -->
+    <details class="db-ops-panel">
+        <summary class="db-ops-summary">
+            <span class="db-ops-title">
+                <svg class="i" aria-hidden="true"><use href="#i-db"/></svg>
+                <strong>Operaciones MongoDB &amp; Reportes Analíticos</strong>
+                <span class="db-ops-sub">Clasificación en lote (updateMany), depuración de catálogo (DELETE) y agregación en reportes_bi</span>
+            </span>
+        </summary>
+        <div class="db-ops-body">
+            <div class="db-ops-actions">
+                <button type="button" id="btnClasificarLote" class="btn btn-outline">
+                    <svg class="i" aria-hidden="true"><use href="#i-tag"/></svg>
+                    <span>Clasificar niveles en lote (updateMany)</span>
+                </button>
+                <button type="button" id="btnPurgarOfertas" class="btn btn-outline">
+                    <svg class="i" aria-hidden="true"><use href="#i-trash"/></svg>
+                    <span>Depurar ofertas con ahorro &lt; 25% (DELETE)</span>
+                </button>
+                <button type="button" id="btnGenerarReporteBi" class="btn btn-primary">
+                    <svg class="i" aria-hidden="true"><use href="#i-bars"/></svg>
+                    <span>Generar y guardar reporte en reportes_bi</span>
+                </button>
+            </div>
+            <div id="dbOpsResultado" class="db-ops-result">
+                Selecciona una operación para ejecutar cambios o agregaciones directamente en MongoDB Atlas.
+            </div>
+        </div>
+    </details>
+
     <div class="workspace-grid">
         <!-- Catálogo Principal -->
         <section class="catalog-section">
-            <div class="toolbar">
+            <search class="toolbar">
                 <label class="search-wrap">
                     <svg class="i search-icon" aria-hidden="true"><use href="#i-search"/></svg>
                     <input id="inputBuscar" type="search" placeholder="Busca tu próximo juego (ej. Elden Ring, Witcher, Resident Evil)" autocomplete="off" aria-label="Buscar juego">
@@ -105,11 +139,12 @@
                     <option value="75">75% o más</option>
                     <option value="85">85% o más</option>
                 </select>
-            </div>
+            </search>
 
             <!-- Pills interactivas de tiendas -->
             <div id="storePills" class="store-pills" role="tablist" aria-label="Filtrar por tienda">
-                <button class="pill active" data-store="TODAS"><svg class="i" aria-hidden="true"><use href="#i-store"/></svg>Todas</button>
+                <button type="button" class="pill active" data-store="TODAS"><svg class="i" aria-hidden="true"><use href="#i-store"/></svg>Todas</button>
+                <button type="button" class="pill" data-store="DESTACADAS"><svg class="i" aria-hidden="true"><use href="#i-star"/></svg>Destacadas</button>
                 <button class="pill" data-store="Steam"><img src="https://www.cheapshark.com/img/stores/icons/0.png" alt="" width="16" height="16" onerror="this.remove()">Steam</button>
                 <button class="pill" data-store="GOG"><img src="https://www.cheapshark.com/img/stores/icons/6.png" alt="" width="16" height="16" onerror="this.remove()">GOG</button>
                 <button class="pill" data-store="Humble Store"><img src="https://www.cheapshark.com/img/stores/icons/10.png" alt="" width="16" height="16" onerror="this.remove()">Humble Store</button>

@@ -80,6 +80,46 @@ public class RadarOfertasService implements OfertaUseCase, ComentarioOfertaUseCa
     }
 
     @Override
+    public Optional<OfertaJuego> actualizarDestacadoYAlerta(String dealId, Double precioAlerta, Boolean destacada) {
+        Optional<OfertaJuego> actualizada = ofertaRepositorioPort.actualizarDestacadoYAlerta(dealId, precioAlerta, destacada);
+        actualizada.ifPresent(oferta -> notificadorPort.publicarEvento("oferta_actualizada", oferta));
+        return actualizada;
+    }
+
+    @Override
+    public Map<String, Object> clasificarOfertasMasivo() {
+        Map<String, Long> conteos = ofertaRepositorioPort.clasificarOfertasMasivo();
+        long totalModificadas = conteos.values().stream().mapToLong(Long::longValue).sum();
+        Map<String, Object> respuesta = Map.of(
+                "totalModificadas", totalModificadas,
+                "porNivel", conteos
+        );
+        notificadorPort.publicarEvento("clasificacion", respuesta);
+        return respuesta;
+    }
+
+    @Override
+    public Map<String, Object> purgarOfertasBajoDescuento(double ahorroMenorA) {
+        double umbralSeguro = Math.min(Math.max(1.0, ahorroMenorA), 70.0);
+        long eliminadas = ofertaRepositorioPort.purgarPorAhorroMenorA(umbralSeguro);
+        long restantes = ofertaRepositorioPort.contarTotal();
+        EstadisticaRadar stats = obtenerEstadisticas();
+        Map<String, Object> respuesta = Map.of(
+                "eliminadas", eliminadas,
+                "restantes", restantes,
+                "estadisticas", stats
+        );
+        notificadorPort.publicarEvento("sincronizacion", Map.of("importadas", 0, "estadisticas", stats));
+        return respuesta;
+    }
+
+    @Override
+    public Map<String, Object> generarYGuardarReporteBi() {
+        long totalComentarios = comentarioRepositorioPort.contarTotal();
+        return ofertaRepositorioPort.generarYGuardarReporteBi(totalComentarios);
+    }
+
+    @Override
     public EstadisticaRadar obtenerEstadisticas() {
         long totalComentarios = comentarioRepositorioPort.contarTotal();
         return ofertaRepositorioPort.calcularEstadisticas(totalComentarios);
@@ -122,6 +162,26 @@ public class RadarOfertasService implements OfertaUseCase, ComentarioOfertaUseCa
         ComentarioOferta guardado = comentarioRepositorioPort.guardar(nuevo);
         notificadorPort.publicarEvento("comentario", guardado);
         return guardado;
+    }
+
+    @Override
+    public Optional<ComentarioOferta> editarComentario(String id, String contenido, int calificacion) {
+        if (contenido == null || contenido.isBlank()) {
+            throw new IllegalArgumentException("El comentario no puede estar vacío");
+        }
+        int calificacionSegura = Math.min(Math.max(1, calificacion), 5);
+        Optional<ComentarioOferta> editado = comentarioRepositorioPort.actualizar(id, contenido.trim(), calificacionSegura);
+        editado.ifPresent(c -> notificadorPort.publicarEvento("comentario_actualizado", c));
+        return editado;
+    }
+
+    @Override
+    public boolean eliminarComentario(String id) {
+        boolean eliminado = comentarioRepositorioPort.eliminarPorId(id);
+        if (eliminado) {
+            notificadorPort.publicarEvento("comentario_eliminado", Map.of("id", id));
+        }
+        return eliminado;
     }
 }
 

@@ -34,7 +34,11 @@ const el = {
     feedComentarios: document.getElementById("feedComentarios"),
     modalDetalle: document.getElementById("modalDetalle"),
     btnCerrarDetalle: document.getElementById("btnCerrarDetalle"),
-    detalleBody: document.getElementById("detalleBody")
+    detalleBody: document.getElementById("detalleBody"),
+    btnClasificarLote: document.getElementById("btnClasificarLote"),
+    btnPurgarOfertas: document.getElementById("btnPurgarOfertas"),
+    btnGenerarReporteBi: document.getElementById("btnGenerarReporteBi"),
+    dbOpsResultado: document.getElementById("dbOpsResultado")
 };
 
 function iniciar() {
@@ -86,6 +90,9 @@ function registrarEventosUI() {
     el.modalDetalle.addEventListener("click", (e) => {
         if (e.target === el.modalDetalle) el.modalDetalle.classList.add("hidden");
     });
+    if (el.btnClasificarLote) el.btnClasificarLote.addEventListener("click", ejecutarClasificacionLote);
+    if (el.btnPurgarOfertas) el.btnPurgarOfertas.addEventListener("click", ejecutarPurgaOfertas);
+    if (el.btnGenerarReporteBi) el.btnGenerarReporteBi.addEventListener("click", ejecutarReporteBi);
 }
 
 async function cargarTodo() {
@@ -200,6 +207,7 @@ function pintarOfertas(ofertas) {
                 <div class="deal-scores">
                     ${o.metacriticScore > 0 ? `<span class="score-pill" title="Puntuación de la crítica">${icono("target")} ${o.metacriticScore}</span>` : ""}
                     ${o.steamRatingPercent > 0 ? `<span class="score-pill" title="Valoración de jugadores">${icono("thumb")} ${o.steamRatingPercent}%</span>` : ""}
+                    ${o.precioAlerta > 0 ? `<span class="score-pill alert-pill" title="Precio alerta configurado">Alerta: $${Number(o.precioAlerta).toFixed(2)}</span>` : ""}
                 </div>
                 <div class="deal-price-row">
                     <span class="price-now">$${Number(o.precioOferta).toFixed(2)}</span>
@@ -209,10 +217,13 @@ function pintarOfertas(ofertas) {
                     <a class="btn btn-mint" href="${urlCompraDirecta(o.dealId)}" target="_blank" rel="noopener noreferrer" title="Ir a la tienda para comprar">
                         ${icono("cart")} Ir a tienda
                     </a>
-                    <button class="btn btn-outline" onclick="darLike('${encodeURIComponent(o.dealId)}')" title="Me gusta" aria-label="Me gusta">
+                    <button type="button" class="btn btn-outline" onclick="darLike('${encodeURIComponent(o.dealId)}')" title="Me gusta" aria-label="Me gusta">
                         ${icono("heart")} <span class="like-count">${o.likes || 0}</span>
                     </button>
-                    <button class="btn btn-outline" onclick="seleccionarObjetivoDesdeBoton('${encodeURIComponent(o.dealId)}', '${encodeURIComponent(o.titulo)}')" title="Comentar sobre este juego" aria-label="Comentar sobre este juego">
+                    <button type="button" class="btn btn-outline ${o.destacada ? "is-starred" : ""}" onclick="alternarDestacada('${encodeURIComponent(o.dealId)}', ${!o.destacada})" title="Destacar en BD (PATCH)" aria-label="Destacar oferta">
+                        ${icono("star")}
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="seleccionarObjetivoDesdeBoton('${encodeURIComponent(o.dealId)}', '${encodeURIComponent(o.titulo)}')" title="Comentar sobre este juego" aria-label="Comentar sobre este juego">
                         ${icono("message")}
                     </button>
                 </div>
@@ -251,10 +262,22 @@ window.abrirDetalle = async function (encodedDealId) {
             <a class="btn btn-mint" href="${urlCompraDirecta(oferta.dealId)}" target="_blank" rel="noopener noreferrer">
                 ${icono("cart")} Comprar ahora en ${escaparHtml(oferta.tiendaNombre)} ${icono("external")}
             </a>
-            <button class="btn btn-primary" onclick="seleccionarDesdeModal('${encodeURIComponent(oferta.dealId)}', '${encodeURIComponent(oferta.titulo)}')">
+            <button type="button" class="btn btn-primary" onclick="seleccionarDesdeModal('${encodeURIComponent(oferta.dealId)}', '${encodeURIComponent(oferta.titulo)}')">
                 ${icono("message")} Escribir opinión
             </button>
         </div>
+
+        <form class="alert-config-box" onsubmit="guardarAlertaModal(event, '${encodeURIComponent(oferta.dealId)}')">
+            <label for="inputPrecioAlerta">Precio objetivo de alerta (USD) en MongoDB:</label>
+            <div class="alert-config-row">
+                <input id="inputPrecioAlerta" type="number" step="0.01" min="0" placeholder="Ej. ${(oferta.precioOferta * 0.85).toFixed(2)}" value="${oferta.precioAlerta > 0 ? oferta.precioAlerta : ""}">
+                <label class="check-inline">
+                    <input id="checkDestacadaModal" type="checkbox" ${oferta.destacada ? "checked" : ""}>
+                    <span>Destacar</span>
+                </label>
+                <button type="submit" class="btn btn-outline">Guardar (PATCH)</button>
+            </div>
+        </form>
 
         <div class="detail-comments" id="detalleComentarios">
             <p class="detail-note">Cargando opiniones de este juego...</p>
@@ -358,7 +381,7 @@ function renderComentarioHtml(c) {
     const fecha = c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleString("es-ES") : "Recién publicado";
     const inicial = String(c.autor || "?").replace(/^@/, "").charAt(0) || "?";
     return `
-        <div class="comment-card">
+        <div class="comment-card" data-comment-id="${escaparHtml(c.id || "")}">
             <div class="comment-head">
                 <span class="comment-who">
                     <span class="comment-avatar" style="background:${colorDesdeTexto(c.autor)}">${escaparHtml(inicial)}</span>
@@ -368,7 +391,14 @@ function renderComentarioHtml(c) {
             </div>
             <div class="comment-game">${icono("gamepad")} ${escaparHtml(c.tituloJuego || "Comunidad General")}</div>
             <p class="comment-body">${escaparHtml(c.contenido)}</p>
-            <div class="comment-time">${fecha}</div>
+            <div class="comment-foot">
+                <span class="comment-time">${fecha}</span>
+                ${c.id ? `
+                <div class="comment-actions">
+                    <button type="button" class="icon-action" onclick="editarComentarioUI('${escaparHtml(c.id)}', ${nota})" title="Editar opinión (PUT)" aria-label="Editar opinión">${icono("edit")}</button>
+                    <button type="button" class="icon-action danger" onclick="eliminarComentarioUI('${escaparHtml(c.id)}')" title="Eliminar opinión (DELETE)" aria-label="Eliminar opinión">${icono("trash")}</button>
+                </div>` : ""}
+            </div>
         </div>
     `;
 }
@@ -419,6 +449,23 @@ function conectarTiempoReal() {
         actualizarLikesEnTarjeta(JSON.parse(event.data));
     });
 
+    eventSource.addEventListener("oferta_actualizada", () => {
+        cargarOfertas();
+    });
+
+    eventSource.addEventListener("comentario_actualizado", (event) => {
+        const editado = JSON.parse(event.data);
+        const card = el.feedComentarios.querySelector(`[data-comment-id="${CSS.escape(editado.id)}"]`);
+        if (card) card.outerHTML = renderComentarioHtml(editado);
+    });
+
+    eventSource.addEventListener("comentario_eliminado", (event) => {
+        const { id } = JSON.parse(event.data);
+        const card = el.feedComentarios.querySelector(`[data-comment-id="${CSS.escape(id)}"]`);
+        if (card) card.remove();
+        cargarEstadisticas();
+    });
+
     eventSource.addEventListener("sincronizacion", (event) => {
         const data = JSON.parse(event.data);
         if (data.estadisticas) pintarEstadisticas(data.estadisticas);
@@ -457,6 +504,147 @@ function escaparHtml(texto) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+window.alternarDestacada = async function (encodedDealId, destacada) {
+    const dealId = decodeURIComponent(encodedDealId);
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/ofertas/destacar?dealId=${encodeURIComponent(dealId)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ destacada })
+        });
+        if (res.ok) cargarOfertas();
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+window.guardarAlertaModal = async function (e, encodedDealId) {
+    e.preventDefault();
+    const dealId = decodeURIComponent(encodedDealId);
+    const val = document.getElementById("inputPrecioAlerta").value;
+    const destacada = document.getElementById("checkDestacadaModal").checked;
+    const precioAlerta = val === "" ? 0 : Number(val);
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/ofertas/destacar?dealId=${encodeURIComponent(dealId)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ precioAlerta, destacada })
+        });
+        if (res.ok) {
+            el.modalDetalle.classList.add("hidden");
+            cargarOfertas();
+        }
+    } catch {
+        alert("No se pudo guardar la alerta en la base de datos.");
+    }
+};
+
+window.editarComentarioUI = async function (id, notaActual) {
+    const card = el.feedComentarios.querySelector(`[data-comment-id="${CSS.escape(id)}"]`);
+    const textoActual = card ? card.querySelector(".comment-body")?.textContent || "" : "";
+    const nuevoContenido = prompt("Editar opinión (PUT en MongoDB):", textoActual);
+    if (nuevoContenido === null || !nuevoContenido.trim()) return;
+    const nuevaNota = Number(prompt("Calificación (1 a 5 estrellas):", String(notaActual || 5))) || notaActual;
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/comentarios/${encodeURIComponent(id)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contenido: nuevoContenido.trim(), calificacion: nuevaNota })
+        });
+        if (res.ok) cargarComentarios();
+    } catch {
+        alert("No se pudo actualizar la opinión.");
+    }
+};
+
+window.eliminarComentarioUI = async function (id) {
+    if (!confirm("¿Eliminar esta opinión de MongoDB Atlas?")) return;
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/comentarios/${encodeURIComponent(id)}`, { method: "DELETE" });
+        if (res.ok) {
+            cargarComentarios();
+            cargarEstadisticas();
+        }
+    } catch {
+        alert("No se pudo eliminar la opinión.");
+    }
+};
+
+async function ejecutarClasificacionLote() {
+    el.dbOpsResultado.textContent = "Ejecutando updateMany en ofertas_juegos...";
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/ofertas/clasificar-lote`, { method: "POST" });
+        const data = await res.json();
+        const detalle = Object.entries(data.porNivel || {})
+            .map(([k, v]) => `<span class="bi-chip"><strong>${escaparHtml(k)}:</strong> ${v}</span>`)
+            .join("");
+        el.dbOpsResultado.innerHTML = `
+            <div class="bi-summary-line">
+                <strong>updateMany completado:</strong> ${data.totalModificadas || 0} ofertas clasificadas en <code>ofertas_juegos</code>.
+            </div>
+            <div class="bi-chips-row">${detalle}</div>
+        `;
+    } catch {
+        el.dbOpsResultado.textContent = "No se pudo ejecutar la clasificación masiva.";
+    }
+}
+
+async function ejecutarPurgaOfertas() {
+    el.dbOpsResultado.textContent = "Depurando ofertas con ahorro menor al 25%...";
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/ofertas/purgar?ahorroMenorA=25`, { method: "DELETE" });
+        const data = await res.json();
+        el.dbOpsResultado.innerHTML = `
+            <div class="bi-summary-line">
+                <strong>DELETE completado en <code>ofertas_juegos</code>:</strong>
+                Eliminadas <strong>${data.eliminadas ?? 0}</strong> ofertas de bajo descuento ·
+                Restantes: <strong>${data.restantes ?? 0}</strong>.
+            </div>
+        `;
+        if (data.estadisticas) pintarEstadisticas(data.estadisticas);
+        cargarOfertas();
+    } catch {
+        el.dbOpsResultado.textContent = "No se pudo depurar la colección de ofertas.";
+    }
+}
+
+async function ejecutarReporteBi() {
+    el.dbOpsResultado.textContent = "Generando agregación y guardando en colección reportes_bi...";
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/ofertas/reporte-bi`, { method: "POST" });
+        const rep = await res.json();
+        const niveles = Object.entries(rep.distribucionNiveles || {});
+        const totalOf = Math.max(1, Number(rep.totalOfertas || 1));
+        const barrasNiveles = niveles.map(([k, v]) => {
+            const pct = Math.round((Number(v) / totalOf) * 100);
+            return `
+                <div class="bi-bar-row">
+                    <span class="bi-bar-label">${escaparHtml(k)} (${v})</span>
+                    <div class="bi-bar-track"><div class="bi-bar-fill" style="--bar-pct: ${pct}%"></div></div>
+                    <span class="bi-bar-pct">${pct}%</span>
+                </div>
+            `;
+        }).join("");
+
+        const ratings = Object.entries(rep.distribucionCalificaciones || {});
+        const chipsRatings = ratings.length
+            ? ratings.map(([k, v]) => `<span class="bi-chip"><strong>${escaparHtml(k)}:</strong> ${v}</span>`).join("")
+            : `<span class="bi-chip">Sin calificaciones aún</span>`;
+
+        el.dbOpsResultado.innerHTML = `
+            <div class="bi-summary-line">
+                Guardado en colección <code>${escaparHtml(rep.coleccionGuardada || "reportes_bi")}</code>
+                (ID: <code>${escaparHtml(rep._id)}</code>) · Destacadas: <strong>${rep.ofertasDestacadas ?? 0}</strong> ·
+                Alertas activas: <strong>${rep.alertasPrecioActivas ?? 0}</strong>
+            </div>
+            <div class="bi-bars-grid">${barrasNiveles}</div>
+            <div class="bi-chips-row"><span>Calificaciones en comunidad:</span> ${chipsRatings}</div>
+        `;
+    } catch {
+        el.dbOpsResultado.textContent = "No se pudo generar el reporte analítico.";
+    }
 }
 
 iniciar();

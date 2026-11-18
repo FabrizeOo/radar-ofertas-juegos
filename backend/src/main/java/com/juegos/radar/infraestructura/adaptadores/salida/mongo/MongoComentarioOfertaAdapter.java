@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -45,6 +46,24 @@ public class MongoComentarioOfertaAdapter implements ComentarioOfertaRepositorio
                 .stream()
                 .map(this::mapearADominio)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<ComentarioOferta> actualizar(String id, String contenido, int calificacion) {
+        return repository.findById(id).map(doc -> {
+            doc.setContenido(contenido);
+            doc.setCalificacion(calificacion);
+            return mapearADominio(repository.save(doc));
+        });
+    }
+
+    @Override
+    public boolean eliminarPorId(String id) {
+        if (id == null || !repository.existsById(id)) {
+            return false;
+        }
+        repository.deleteById(id);
+        return true;
     }
 
     @Override

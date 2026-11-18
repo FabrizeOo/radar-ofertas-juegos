@@ -795,8 +795,8 @@ textarea {
 
 .deal-actions {
     display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 0.4rem;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 0.35rem;
     margin-top: 0.35rem;
 }
 
@@ -1199,6 +1199,223 @@ textarea {
 
 .hidden {
     display: none !important;
+}
+
+/* Panel Operaciones MongoDB & Analítica BI */
+.db-ops-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    padding: 0.9rem 1.15rem;
+}
+
+.db-ops-panel[open] {
+    border-color: var(--border-strong);
+}
+
+.db-ops-summary {
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text);
+    user-select: none;
+}
+
+.db-ops-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+}
+
+.db-ops-title .i {
+    color: var(--violet-text);
+}
+
+.db-ops-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.db-ops-body {
+    margin-top: 0.95rem;
+    padding-top: 0.95rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.db-ops-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.db-ops-result {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.85rem 1rem;
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.bi-summary-line code {
+    font-family: monospace;
+    background: var(--violet-soft);
+    color: var(--violet-text);
+    padding: 0.1rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.76rem;
+}
+
+.bi-chips-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.bi-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+}
+
+.bi-bars-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.bi-bar-row {
+    display: grid;
+    grid-template-columns: 185px 1fr 48px;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.76rem;
+}
+
+.bi-bar-track {
+    height: 8px;
+    background: var(--surface);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bi-bar-fill {
+    height: 100%;
+    width: var(--bar-pct, 0%);
+    background: linear-gradient(90deg, var(--violet), var(--mint));
+    border-radius: 999px;
+    transition: width 0.35s ease;
+}
+
+.bi-bar-pct {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+}
+
+.alert-pill {
+    color: var(--amber);
+    border-color: rgba(245, 158, 11, 0.4);
+    background: rgba(245, 158, 11, 0.12);
+}
+
+.btn.is-starred {
+    color: var(--amber);
+    border-color: rgba(245, 158, 11, 0.5);
+}
+
+.btn.is-starred .i {
+    fill: currentColor;
+}
+
+.alert-config-box {
+    margin-top: 0.9rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.8rem 0.95rem;
+    font-size: 0.8rem;
+}
+
+.alert-config-box > label {
+    display: block;
+    color: var(--muted);
+    margin-bottom: 0.45rem;
+    font-weight: 600;
+}
+
+.alert-config-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.alert-config-row input[type="number"] {
+    flex: 1;
+    min-width: 140px;
+}
+
+.check-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.check-inline input {
+    width: auto;
+}
+
+.comment-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.45rem;
+}
+
+.comment-foot .comment-time {
+    margin-top: 0;
+}
+
+.comment-actions {
+    display: inline-flex;
+    gap: 0.3rem;
+}
+
+.icon-action {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 0.2rem 0.38rem;
+    cursor: pointer;
+    display: inline-grid;
+    place-items: center;
+    font-size: 0.75rem;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.icon-action:hover {
+    color: var(--violet-text);
+    border-color: var(--violet);
+}
+
+.icon-action.danger:hover {
+    color: #fb7185;
+    border-color: #fb7185;
 }
 
 @media (max-width: 600px) {

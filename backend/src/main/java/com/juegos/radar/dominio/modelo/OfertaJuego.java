@@ -22,6 +22,9 @@ public class OfertaJuego {
     private String urlImagen;
     private Instant fechaActualizacion;
     private long likes;
+    private Double precioAlerta;
+    private boolean destacada;
+    private String nivelOferta;
 
     public OfertaJuego() {
     }
@@ -103,5 +106,14 @@ public class OfertaJuego {
 
     public long getLikes() { return likes; }
     public void setLikes(long likes) { this.likes = likes; }
+
+    public Double getPrecioAlerta() { return precioAlerta; }
+    public void setPrecioAlerta(Double precioAlerta) { this.precioAlerta = precioAlerta; }
+
+    public boolean isDestacada() { return destacada; }
+    public void setDestacada(boolean destacada) { this.destacada = destacada; }
+
+    public String getNivelOferta() { return nivelOferta; }
+    public void setNivelOferta(String nivelOferta) { this.nivelOferta = nivelOferta; }
 }
 

@@ -14,11 +14,15 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.bson.Document;
 
 @Component
 public class MongoOfertaAdapter implements OfertaRepositorioPort {
@@ -68,8 +72,12 @@ public class MongoOfertaAdapter implements OfertaRepositorioPort {
             criterios.add(Criteria.where("titulo").regex(escaped, "i"));
         }
         if (tienda != null && !tienda.isBlank() && !"TODAS".equalsIgnoreCase(tienda.trim())) {
-            String escapedStore = Pattern.quote(tienda.trim());
-            criterios.add(Criteria.where("tiendaNombre").regex("^" + escapedStore + "$", "i"));
+            if ("DESTACADAS".equalsIgnoreCase(tienda.trim())) {
+                criterios.add(Criteria.where("destacada").is(true));
+            } else {
+                String escapedStore = Pattern.quote(tienda.trim());
+                criterios.add(Criteria.where("tiendaNombre").regex("^" + escapedStore + "$", "i"));
+            }
         }
         if (ahorroMinimo > 0) {
             criterios.add(Criteria.where("porcentajeAhorro").gte(ahorroMinimo));
@@ -105,6 +113,113 @@ public class MongoOfertaAdapter implements OfertaRepositorioPort {
                 OfertaDocumento.class
         );
         return Optional.ofNullable(modificado).map(this::mapearADominio);
+    }
+
+    @Override
+    public Optional<OfertaJuego> actualizarDestacadoYAlerta(String dealId, Double precioAlerta, Boolean destacada) {
+        Query query = Query.query(Criteria.where("_id").is(dealId));
+        Update update = new Update();
+        if (precioAlerta != null) {
+            if (precioAlerta <= 0) {
+                update.unset("precioAlerta");
+            } else {
+                update.set("precioAlerta", precioAlerta);
+            }
+        }
+        if (destacada != null) {
+            update.set("destacada", destacada);
+        }
+        OfertaDocumento modificado = mongoTemplate.findAndModify(
+                query,
+                update,
+                FindAndModifyOptions.options().returnNew(true),
+                OfertaDocumento.class
+        );
+        return Optional.ofNullable(modificado).map(this::mapearADominio);
+    }
+
+    @Override
+    public Map<String, Long> clasificarOfertasMasivo() {
+        mongoTemplate.updateMulti(new Query(), new Update().set("nivelOferta", "REBAJA_MEDIA"), OfertaDocumento.class);
+
+        mongoTemplate.updateMulti(
+                Query.query(Criteria.where("porcentajeAhorro").gte(60).lt(80)),
+                new Update().set("nivelOferta", "GRAN_DESCUENTO"),
+                OfertaDocumento.class
+        );
+        mongoTemplate.updateMulti(
+                Query.query(Criteria.where("porcentajeAhorro").gte(80)),
+                new Update().set("nivelOferta", "IMPERDIBLE"),
+                OfertaDocumento.class
+        );
+
+        Aggregation agg = Aggregation.newAggregation(
+                Aggregation.group("nivelOferta").count().as("total")
+        );
+        AggregationResults<Document> results = mongoTemplate.aggregate(agg, "ofertas_juegos", Document.class);
+        Map<String, Long> conteos = new LinkedHashMap<>();
+        for (Document d : results.getMappedResults()) {
+            String k = d.getString("_id") != null ? d.getString("_id") : "REBAJA_MEDIA";
+            Number n = d.get("total", Number.class);
+            conteos.put(k, n != null ? n.longValue() : 0L);
+        }
+        return conteos;
+    }
+
+    @Override
+    public long purgarPorAhorroMenorA(double ahorroMenorA) {
+        Query query = Query.query(
+                Criteria.where("porcentajeAhorro").lt(ahorroMenorA)
+                        .and("destacada").ne(true)
+        );
+        return mongoTemplate.remove(query, OfertaDocumento.class).getDeletedCount();
+    }
+
+    @Override
+    public Map<String, Object> generarYGuardarReporteBi(long totalComentarios) {
+        Map<String, Long> porNivel = clasificarOfertasMasivo();
+        long destacadas = mongoTemplate.count(Query.query(Criteria.where("destacada").is(true)), OfertaDocumento.class);
+        long conAlerta = mongoTemplate.count(Query.query(Criteria.where("precioAlerta").gt(0)), OfertaDocumento.class);
+
+        EstadisticaRadar stats = calcularEstadisticas(totalComentarios);
+
+        Aggregation aggRatings = Aggregation.newAggregation(
+                Aggregation.group("calificacion").count().as("total")
+        );
+        AggregationResults<Document> resRatings = mongoTemplate.aggregate(aggRatings, "comentarios_ofertas", Document.class);
+        Map<String, Long> distribucionCalificaciones = new LinkedHashMap<>();
+        for (Document d : resRatings.getMappedResults()) {
+            Object idObj = d.get("_id");
+            String key = idObj != null ? idObj + "_estrellas" : "5_estrellas";
+            Number n = d.get("total", Number.class);
+            distribucionCalificaciones.put(key, n != null ? n.longValue() : 0L);
+        }
+
+        List<Map<String, Object>> tiendasMap = stats.porTienda().stream()
+                .map(t -> Map.<String, Object>of(
+                        "tiendaNombre", t.tiendaNombre(),
+                        "cantidadOfertas", t.cantidadOfertas(),
+                        "ahorroPromedio", t.ahorroPromedio(),
+                        "precioMinimo", t.precioMinimo()
+                ))
+                .collect(Collectors.toList());
+
+        Document reporteDoc = new Document("_id", "ultimo_reporte_ofertas")
+                .append("fechaGeneracion", Instant.now().toString())
+                .append("totalOfertas", stats.totalOfertas())
+                .append("totalComentarios", totalComentarios)
+                .append("ahorroPromedioGlobal", stats.ahorroPromedio())
+                .append("ofertasDestacadas", destacadas)
+                .append("alertasPrecioActivas", conAlerta)
+                .append("distribucionNiveles", porNivel)
+                .append("distribucionCalificaciones", distribucionCalificaciones)
+                .append("resumenTiendas", tiendasMap);
+
+        mongoTemplate.save(reporteDoc, "reportes_bi");
+
+        Map<String, Object> out = new LinkedHashMap<>(reporteDoc);
+        out.put("coleccionGuardada", "reportes_bi");
+        return out;
     }
 
     @Override
@@ -151,7 +266,7 @@ public class MongoOfertaAdapter implements OfertaRepositorioPort {
     }
 
     private OfertaJuego mapearADominio(OfertaDocumento doc) {
-        return new OfertaJuego(
+        OfertaJuego o = new OfertaJuego(
                 doc.getDealId(),
                 doc.getGameId(),
                 doc.getTitulo(),
@@ -168,6 +283,10 @@ public class MongoOfertaAdapter implements OfertaRepositorioPort {
                 doc.getFechaActualizacion(),
                 doc.getLikes()
         );
+        o.setPrecioAlerta(doc.getPrecioAlerta());
+        o.setDestacada(doc.isDestacada());
+        o.setNivelOferta(doc.getNivelOferta());
+        return o;
     }
 
     private static class TiendaAggResult {

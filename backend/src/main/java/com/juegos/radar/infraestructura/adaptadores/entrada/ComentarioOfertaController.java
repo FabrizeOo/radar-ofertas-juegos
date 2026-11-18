@@ -40,9 +40,30 @@ public class ComentarioOfertaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ComentarioOferta> editarComentario(
+            @PathVariable String id,
+            @RequestBody EditarComentarioOfertaRequest request) {
+        return comentarioUseCase.editarComentario(id, request.contenido(), request.calificacion())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarComentario(@PathVariable String id) {
+        return comentarioUseCase.eliminarComentario(id)
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
+
     public record NuevoComentarioRequest(
             String dealId,
             String autor,
+            String contenido,
+            int calificacion
+    ) {}
+
+    public record EditarComentarioOfertaRequest(
             String contenido,
             int calificacion
     ) {}

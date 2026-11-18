@@ -59,6 +59,32 @@ public class OfertaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PatchMapping("/destacar")
+    public ResponseEntity<OfertaJuego> destacarOferta(
+            @RequestParam String dealId,
+            @RequestBody AlertaOfertaRequest request) {
+        return ofertaUseCase.actualizarDestacadoYAlerta(dealId, request.precioAlerta(), request.destacada())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/clasificar-lote")
+    public Map<String, Object> clasificarMasivo() {
+        return ofertaUseCase.clasificarOfertasMasivo();
+    }
+
+    @DeleteMapping("/purgar")
+    public Map<String, Object> purgarBajoDescuento(@RequestParam(defaultValue = "25") double ahorroMenorA) {
+        return ofertaUseCase.purgarOfertasBajoDescuento(ahorroMenorA);
+    }
+
+    @PostMapping("/reporte-bi")
+    public Map<String, Object> generarReporteBi() {
+        return ofertaUseCase.generarYGuardarReporteBi();
+    }
+
+    public record AlertaOfertaRequest(Double precioAlerta, Boolean destacada) {}
+
     @GetMapping("/estadisticas")
     public EstadisticaRadar obtenerEstadisticas() {
         return ofertaUseCase.obtenerEstadisticas();
