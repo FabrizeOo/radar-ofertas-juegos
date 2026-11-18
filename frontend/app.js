@@ -83,7 +83,7 @@ function registrarEventosUI() {
         cargarOfertas();
     });
 
-    el.btnRefreshCatalog.addEventListener("click", actualizarCatalogo);
+    if (el.btnRefreshCatalog) el.btnRefreshCatalog.addEventListener("click", actualizarCatalogo);
     el.formComentario.addEventListener("submit", enviarComentario);
     el.btnLimpiarTarget.addEventListener("click", () => seleccionarObjetivo("GENERAL", "Comunidad General"));
     el.btnCerrarDetalle.addEventListener("click", () => el.modalDetalle.classList.add("hidden"));
@@ -432,8 +432,8 @@ function conectarTiempoReal() {
     eventSource = new EventSource(`${API_BASE_URL}/api/ofertas/stream`);
 
     eventSource.addEventListener("conectado", () => {
-        el.liveIndicator.className = "pulse-badge online";
-        el.liveText.textContent = "Actualizado al instante";
+        if (el.liveIndicator) el.liveIndicator.className = "pulse-badge online";
+        if (el.liveText) el.liveText.textContent = "Actualizado al instante";
     });
 
     eventSource.addEventListener("comentario", (event) => {
@@ -473,8 +473,8 @@ function conectarTiempoReal() {
     });
 
     eventSource.onerror = () => {
-        el.liveIndicator.className = "pulse-badge";
-        el.liveText.textContent = "Reconectando...";
+        if (el.liveIndicator) el.liveIndicator.className = "pulse-badge";
+        if (el.liveText) el.liveText.textContent = "Reconectando...";
     };
 }
 

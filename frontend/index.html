@@ -42,29 +42,6 @@
 
 <div class="ambient-bg" aria-hidden="true"></div>
 
-<header class="navbar">
-    <div class="nav-inner">
-        <div class="brand">
-            <img class="brand-icon" src="logo.svg" width="42" height="42" alt="Logo de LootRadar">
-            <div>
-                <h1>Loot<span>Radar</span></h1>
-                <p>Cazador de ofertas PC en tiendas oficiales</p>
-            </div>
-        </div>
-
-        <div class="nav-actions">
-            <div id="liveIndicator" class="pulse-badge">
-                <span class="pulse-dot"></span>
-                <span id="liveText">Conectando...</span>
-            </div>
-            <button id="btnRefreshCatalog" class="btn btn-outline">
-                <svg class="i" aria-hidden="true"><use href="#i-refresh"/></svg>
-                <span>Actualizar ofertas</span>
-            </button>
-        </div>
-    </div>
-</header>
-
 <main class="container">
     <!-- Hero: Oferta destacada del momento -->
     <section id="heroSpotlight" class="hero-card skeleton-hero">
@@ -93,36 +70,6 @@
             <div id="statTiendas" class="store-chips">Cargando...</div>
         </div>
     </section>
-
-    <!-- Panel de Operaciones de Base de Datos (CRUD + Agregaciones MongoDB) -->
-    <details class="db-ops-panel">
-        <summary class="db-ops-summary">
-            <span class="db-ops-title">
-                <svg class="i" aria-hidden="true"><use href="#i-db"/></svg>
-                <strong>Operaciones MongoDB &amp; Reportes Analíticos</strong>
-                <span class="db-ops-sub">Clasificación en lote (updateMany), depuración de catálogo (DELETE) y agregación en reportes_bi</span>
-            </span>
-        </summary>
-        <div class="db-ops-body">
-            <div class="db-ops-actions">
-                <button type="button" id="btnClasificarLote" class="btn btn-outline">
-                    <svg class="i" aria-hidden="true"><use href="#i-tag"/></svg>
-                    <span>Clasificar niveles en lote (updateMany)</span>
-                </button>
-                <button type="button" id="btnPurgarOfertas" class="btn btn-outline">
-                    <svg class="i" aria-hidden="true"><use href="#i-trash"/></svg>
-                    <span>Depurar ofertas con ahorro &lt; 25% (DELETE)</span>
-                </button>
-                <button type="button" id="btnGenerarReporteBi" class="btn btn-primary">
-                    <svg class="i" aria-hidden="true"><use href="#i-bars"/></svg>
-                    <span>Generar y guardar reporte en reportes_bi</span>
-                </button>
-            </div>
-            <div id="dbOpsResultado" class="db-ops-result">
-                Selecciona una operación para ejecutar cambios o agregaciones directamente en MongoDB Atlas.
-            </div>
-        </div>
-    </details>
 
     <div class="workspace-grid">
         <!-- Catálogo Principal -->
